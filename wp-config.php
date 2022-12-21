@@ -28,7 +28,7 @@ define( 'DB_NAME', 'u592644210_f1oat' );
 define( 'DB_USER', 'u592644210_T6WCH' );
 
 /** Database password */
-define( 'DB_PASSWORD', 'HoJ9An8Bnf' );
+define( 'DB_PASSWORD', 'G?n0qiHuV7@' );
 
 /** Database hostname */
 define( 'DB_HOST', 'mysql' );
