@@ -124,6 +124,16 @@ class OMAPI_Pages {
 				'callback' => array( $this, 'render_app_loading_page' ),
 			);
 
+			$this->pages['optin-monster-playbooks'] = array(
+				'name'             => __( 'Playbooks', 'optin-monster-api' ),
+				'app'              => true,
+				'callback'         => array( $this, 'render_app_loading_page' ),
+				'new_badge_period' => array(
+					'start' => '2023-02-02 00:00:00',
+					'end'   => '2023-03-03 59:59:59',
+				),
+			);
+
 			$this->pages['optin-monster-monsterleads'] = array(
 				'name'     => __( 'Subscribers', 'optin-monster-api' ),
 				'app'      => true,
@@ -342,10 +352,15 @@ class OMAPI_Pages {
 					$parent_slug .= '-hidden';
 				}
 
+				$menu_title = ! empty( $page['menu'] ) ? $page['menu'] : $page['name'];
+				if ( $this->maybe_add_new_badge( $page ) ) {
+					$menu_title .= ' <span class="omapi-menu-new">New!<span>';
+				}
+
 				$hooks[] = $hook = add_submenu_page(
 					$parent_slug, // $parent_slug
 					$page['name'], // $page_title
-					! empty( $page['menu'] ) ? $page['menu'] : $page['name'], // $menu_title
+					$menu_title,
 					$this->base->access_capability( $page['slug'] ),
 					$page['slug'],
 					$page['callback']
@@ -467,54 +482,50 @@ class OMAPI_Pages {
 
 			$current_user = wp_get_current_user();
 
-			$js_args = wp_parse_args(
-				$args,
-				array(
-					'key'             => ! empty( $creds['apikey'] ) ? $creds['apikey'] : '',
-					'nonce'           => wp_create_nonce( 'wp_rest' ),
-					'siteId'          => $this->base->get_site_id(),
-					'siteIds'         => $this->base->get_site_ids(),
-					'wpUrl'           => trailingslashit( site_url() ),
-					'adminUrl'        => OMAPI_Urls::admin(),
-					'restUrl'         => rest_url(),
-					'adminPath'       => $admin_parts['path'],
-					'apijsUrl'        => OPTINMONSTER_APIJS_URL,
-					'omAppUrl'        => untrailingslashit( OPTINMONSTER_APP_URL ),
-					'marketing'       => untrailingslashit( OPTINMONSTER_URL ),
-					'omAppApiUrl'     => untrailingslashit( OPTINMONSTER_API_URL ),
-					'omAppCdnURL'     => untrailingslashit( OPTINMONSTER_CDN_URL ),
-					'newCampaignUrl'  => untrailingslashit( esc_url_raw( admin_url( 'admin.php?page=optin-monster-templates' ) ) ),
-					'shareableUrl'    => untrailingslashit( OPTINMONSTER_SHAREABLE_LINK ),
-					'pluginPath'      => $url_parts['path'],
-					'omStaticDataKey' => 'omWpApi',
-					'isItWp'          => true,
-					// 'scriptPath'   => $path,
-					'pages'           => $pages,
-					'titleTag'        => html_entity_decode( $this->title_tag ),
-					'isWooActive'     => OMAPI_WooCommerce::is_active(),
-					'isWooConnected'  => OMAPI_WooCommerce::is_connected(),
-					'isEddActive'     => OMAPI_EasyDigitalDownloads::is_active(),
-					'isEddConnected'  => OMAPI_EasyDigitalDownloads::is_connected(),
-					'blogname'        => esc_attr( get_option( 'blogname' ) ),
-					'userEmail'       => esc_attr( $current_user->user_email ),
-					'userFirstName'   => esc_attr( $current_user->user_firstname ),
-					'userLastName'    => esc_attr( $current_user->user_lastname ),
-					'betaVersion'     => $this->base->beta_version(),
-					'pluginVersion'   => $this->base->version,
-					'partnerId'       => OMAPI_Partners::get_id(),
-					'partnerUrl'      => OMAPI_Partners::has_partner_url(),
-					'referredBy'      => OMAPI_Partners::referred_by(),
-					'showReview'      => $this->base->review->should_show_review(),
-					'timezone'        => wp_timezone_string(),
-				)
+			$defaults = array(
+				'key'             => ! empty( $creds['apikey'] ) ? $creds['apikey'] : '',
+				'nonce'           => wp_create_nonce( 'wp_rest' ),
+				'siteId'          => $this->base->get_site_id(),
+				'siteIds'         => $this->base->get_site_ids(),
+				'wpUrl'           => trailingslashit( site_url() ),
+				'adminUrl'        => OMAPI_Urls::admin(),
+				'restUrl'         => rest_url(),
+				'adminPath'       => $admin_parts['path'],
+				'apijsUrl'        => OPTINMONSTER_APIJS_URL,
+				'omAppUrl'        => untrailingslashit( OPTINMONSTER_APP_URL ),
+				'marketing'       => untrailingslashit( OPTINMONSTER_URL ),
+				'omAppApiUrl'     => untrailingslashit( OPTINMONSTER_API_URL ),
+				'omAppCdnURL'     => untrailingslashit( OPTINMONSTER_CDN_URL ),
+				'newCampaignUrl'  => untrailingslashit( esc_url_raw( admin_url( 'admin.php?page=optin-monster-templates' ) ) ),
+				'shareableUrl'    => untrailingslashit( OPTINMONSTER_SHAREABLE_LINK ),
+				'pluginPath'      => $url_parts['path'],
+				'omStaticDataKey' => 'omWpApi',
+				'isItWp'          => true,
+				// 'scriptPath'   => $path,
+				'pages'           => $pages,
+				'titleTag'        => html_entity_decode( $this->title_tag ),
+				'isWooActive'     => OMAPI_WooCommerce::is_active(),
+				'isWooConnected'  => OMAPI_WooCommerce::is_connected(),
+				'isEddActive'     => OMAPI_EasyDigitalDownloads::is_active(),
+				'isEddConnected'  => OMAPI_EasyDigitalDownloads::is_connected(),
+				'isWPFormsActive' => OMAPI_WPForms::is_active(),
+				'blogname'        => esc_attr( get_option( 'blogname' ) ),
+				'userEmail'       => esc_attr( $current_user->user_email ),
+				'userFirstName'   => esc_attr( $current_user->user_firstname ),
+				'userLastName'    => esc_attr( $current_user->user_lastname ),
+				'betaVersion'     => $this->base->beta_version(),
+				'pluginVersion'   => $this->base->version,
+				'pluginsInfo'     => ( new OMAPI_Plugins() )->get_active_plugins_header_value(),
+				'partnerId'       => OMAPI_Partners::get_id(),
+				'partnerUrl'      => OMAPI_Partners::has_partner_url(),
+				'referredBy'      => OMAPI_Partners::referred_by(),
+				'showReview'      => $this->base->review->should_show_review(),
+				'timezone'        => wp_timezone_string(),
 			);
-
-			$js_args = apply_filters( 'optin_monster_campaigns_js_api_args', $js_args );
+			$js_args  = wp_parse_args( $args, $defaults );
+			$js_args  = apply_filters( 'optin_monster_campaigns_js_api_args', $js_args );
 
 			$loader->localize( $js_args );
-
-			wp_enqueue_script( $this->base->plugin_slug . '-api-script', OPTINMONSTER_APIJS_URL, $loader->handles['js'], null, true );
-			add_filter( 'script_loader_tag', array( $this, 'filter_api_script' ), 10, 2 );
 
 			return $loader;
 
@@ -522,33 +533,6 @@ class OMAPI_Pages {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Filters the API script tag to add the preview user/account data attributes.
-	 *
-	 * @since 2.0.0
-	 *
-	 * @param string $tag    The HTML script output.
-	 * @param string $handle The script handle to target.
-	 * @return string $tag   Amended HTML script with our ID attribute appended.
-	 */
-	public function filter_api_script( $tag, $handle ) {
-
-		// If the handle is not ours, do nothing.
-		if ( $this->base->plugin_slug . '-api-script' !== $handle ) {
-			return $tag;
-		}
-
-		// Adjust the output to add our custom script ID.
-		return str_replace(
-			' src',
-			sprintf(
-				' data-account="56690" data-user="50374" async %s src',
-				defined( 'OPTINMONSTER_ENV' ) ? 'data-env="' . OPTINMONSTER_ENV . '"' : ''
-			),
-			$tag
-		);
 	}
 
 	/**
@@ -576,6 +560,27 @@ class OMAPI_Pages {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Determine if a page should have a "new" badge.
+	 *
+	 * @param array $page The page data.
+	 *
+	 * @return boolean True if the given page should have a new badge
+	 */
+	public function maybe_add_new_badge( $page ) {
+		if ( empty( $page['new_badge_period']['start'] ) ) {
+			return false;
+		}
+
+		$now = new DateTime( 'now', new DateTimeZone( 'America/New_York' ) );
+
+		return OMAPI_Utils::date_within(
+			$now,
+			$page['new_badge_period']['start'],
+			$page['new_badge_period']['end']
+		);
 	}
 
 }

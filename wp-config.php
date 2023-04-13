@@ -31,7 +31,7 @@ define( 'DB_USER', 'u592644210_T6WCH' );
 define( 'DB_PASSWORD', 'G?n0qiHuV7@' );
 
 /** Database hostname */
-define( 'DB_HOST', 'mysql' );
+define( 'DB_HOST', '127.0.0.1' );
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );
@@ -91,6 +91,7 @@ define( 'WP_DEBUG', false );
 
 
 define( 'WP_AUTO_UPDATE_CORE', 'minor' );
+define( 'FS_METHOD', 'direct' );
 /* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */

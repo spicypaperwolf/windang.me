@@ -1,6 +1,41 @@
 # Changelog
 All notable changes to the OptinMonster plugin will be documented in this file.
 
+### 2.13.1 - 2023-04-03
+* Added announcements/product education widgets to the Dashboard page.
+* Fixed an issue where initiating a campaign search failed to reset pagination.
+* Fixed the incorrect number of campaigns listed in "Lite vs Pro" comparison table.
+* Updated the support link to point to WordPress.org support for free users.
+* Maintenance updates for an npm package, Babel configuration.
+
+### 2.13.0 - 2023-03-10
+* Introduce integration support with MemberPress!
+* Improve compatability with LearnPress LMS plugin
+* Fixed issue where errors could appear on the campaign output settings page preventing output settings from being edited.
+* Fixed an issue where campaign output settings could disappear making if difficult to edit the output settings.
+* Various npm package updates used for generating our JavaScript code.
+
+### 2.12.2 - 2023-02-10
+* Security update to ensure OptinMonster shortcodes can only load from the campaign post-type.
+
+### 2.12.1 - 2023-02-03
+* Fixed Template preview button text stuck on "Loading Preview".
+
+### 2.12.0 - 2023-02-02
+* Fixed wp_enqueue_script error on widgets page.
+* Addresses issues with page caching by fetching rules data for Easy Digital Downloads and WooCommerce via ajax.
+* Small improvements to onbaording
+* Updated bundled version of Vue and related dependencies to address some security scanners.
+* Introduced Playbooks to the plugin
+
+### 2.11.2 - 2023-01-18
+* Fixed issue where plain-text shortcode output could be parsed by search engines.
+* Set minimum Elementor support to 3.1.0, and fix deprecated function warnings.
+* Update code initialization logic to allow just-in-time loading and preventing some errors.
+* Various npm packages updates used for generating our JavaScript code.
+* Remove references to Bronto, as Bronto shutdown as a service.
+* Fix issue where inline campaigns would be could show excerpts.
+
 ### 2.11.1 - 2022-11-29
 * Fix occasional undefined variable warning in logs
 * Maintenance updates to some JS packages
